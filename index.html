@@ -21,31 +21,28 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    /* palette */
-    --bg-0: #07090a;        /* deepest */
-    --bg-1: #0c1110;        /* base */
-    --bg-2: #131918;        /* surface */
-    --bg-3: #1a221f;        /* elevated */
+    --bg-0: #07090a;
+    --bg-1: #0c1110;
+    --bg-2: #131918;
+    --bg-3: #1a221f;
     --line: rgba(255, 255, 255, 0.06);
     --line-strong: rgba(255, 255, 255, 0.12);
 
-    --fg-0: #f1f3ee;        /* high contrast */
-    --fg-1: #c9cdc6;        /* primary text */
-    --fg-2: #8a948c;        /* muted */
-    --fg-3: #555c57;        /* very muted */
+    --fg-0: #f1f3ee;
+    --fg-1: #c9cdc6;
+    --fg-2: #8a948c;
+    --fg-3: #555c57;
 
-    --accent: #2eaa8a;      /* petrol green - bright */
-    --accent-deep: #1a5e54; /* petrol green - deep */
+    --accent: #2eaa8a;
+    --accent-deep: #1a5e54;
     --accent-glow: rgba(46, 170, 138, 0.25);
 
     --shadow-strong: 0 30px 80px -20px rgba(0,0,0,0.7);
 
-    /* type */
     --font-display: "Fraunces", "Times New Roman", serif;
     --font-body: "Manrope", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
 
-    /* spacing */
     --gutter: clamp(1rem, 4vw, 3rem);
   }
 
@@ -338,6 +335,208 @@
   }
 
   /* ============================================
+     SLIDER (FEATURE BOX)
+     ============================================ */
+  .slider-section {
+    padding: clamp(4rem, 10vh, 7rem) var(--gutter) clamp(2rem, 6vh, 4rem);
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .slider-section__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .slider-section__num {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+  }
+  .slider-section__title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: "SOFT" 60, "WONK" 1, "opsz" 144;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    color: var(--fg-0);
+  }
+  .slider-section__sub {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--fg-2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: right;
+    max-width: 22ch;
+  }
+  @media (max-width: 640px) {
+    .slider-section__head { flex-direction: column; align-items: flex-start; }
+    .slider-section__sub { text-align: left; }
+  }
+
+  .slider {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--bg-0);
+    box-shadow: var(--shadow-strong);
+  }
+  .slider__track {
+    position: absolute;
+    inset: 0;
+  }
+  .slider__frame {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+  }
+  .slider__frame.active { opacity: 1; }
+  .slider__frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* progress bar at the very top of the slider */
+  .slider__progress {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(255,255,255,0.08);
+    z-index: 5;
+  }
+  .slider__progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* metadata overlay (phase + caption) */
+  .slider__overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: clamp(1rem, 3vw, 2rem) clamp(1.2rem, 4vw, 2.5rem);
+    background: linear-gradient(to top, rgba(7,9,10,0.85) 0%, rgba(7,9,10,0.0) 100%);
+    z-index: 4;
+    pointer-events: none;
+  }
+  .slider__phase {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    transition: opacity 0.4s ease;
+  }
+  .slider__caption {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: "SOFT" 60, "opsz" 36;
+    font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+    line-height: 1.3;
+    color: var(--fg-0);
+    letter-spacing: -0.005em;
+    transition: opacity 0.4s ease;
+  }
+
+  /* nav buttons */
+  .slider__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(7,9,10,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--fg-0);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    opacity: 0;
+  }
+  .slider:hover .slider__nav { opacity: 1; }
+  .slider__nav:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-0);
+  }
+  .slider__nav.prev { left: 1rem; }
+  .slider__nav.next { right: 1rem; }
+  @media (max-width: 640px) {
+    .slider__nav { opacity: 1; width: 36px; height: 36px; }
+  }
+
+  /* play/pause button */
+  .slider__play {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(7,9,10,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--fg-0);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+  }
+  .slider__play:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-0);
+  }
+  .slider__play svg { width: 14px; height: 14px; fill: currentColor; }
+
+  /* dots indicator */
+  .slider__dots {
+    position: absolute;
+    bottom: 1rem; right: 1rem;
+    display: flex;
+    gap: 0.4rem;
+    z-index: 6;
+  }
+  .slider__dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.25s ease;
+  }
+  .slider__dot.active {
+    background: var(--accent);
+    transform: scale(1.3);
+  }
+  .slider__dot:hover { background: rgba(255,255,255,0.5); }
+  .slider__dot.active:hover { background: var(--accent); }
+
+  /* ============================================
      CONTROLS / FILTER BAR
      ============================================ */
   .controls {
@@ -347,6 +546,7 @@
     background: rgba(7,9,10,0.92);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
     padding: 1rem var(--gutter);
     display: flex;
@@ -487,6 +687,7 @@
   .card.wide   { grid-column: span 6; }
   .card.full   { grid-column: span 12; }
   .card.tall   { grid-column: span 4; grid-row: span 2; }
+  .card.portrait { grid-column: span 3; grid-row: span 2; }
   .card:hover { transform: translateY(-2px); }
 
   @media (max-width: 1000px) {
@@ -494,9 +695,10 @@
     .card.wide { grid-column: span 12; }
     .card.full { grid-column: span 12; }
     .card.tall { grid-column: span 6; grid-row: span 1; }
+    .card.portrait { grid-column: span 4; grid-row: span 2; }
   }
   @media (max-width: 640px) {
-    .card, .card.wide, .card.full, .card.tall {
+    .card, .card.wide, .card.full, .card.tall, .card.portrait {
       grid-column: span 12;
       grid-row: auto;
     }
@@ -509,6 +711,7 @@
     background: var(--bg-0);
   }
   .card.tall .card__img-wrap { aspect-ratio: 16 / 19; }
+  .card.portrait .card__img-wrap { aspect-ratio: 7 / 10; }
   .card__img {
     width: 100%;
     height: 100%;
@@ -704,7 +907,7 @@
   }
 
   /* ============================================
-     SECTION DIVIDER (full-bleed image accents)
+     SECTION DIVIDER
      ============================================ */
   .divider {
     position: relative;
@@ -797,7 +1000,6 @@
      ============================================ */
   .hidden { display: none !important; }
 
-  /* Smooth fade-in for cards on filter change */
   .card { animation: cardIn 0.5s ease backwards; }
   @keyframes cardIn {
     from { opacity: 0; transform: translateY(12px); }
@@ -811,6 +1013,7 @@
 <nav class="nav" id="nav">
   <div class="nav__brand">PETROL<span style="opacity:0.5;letter-spacing:0.2em;margin-left:0.5rem;">// LS</span></div>
   <div class="nav__links">
+    <a href="#timelapse">00 Time-lapse</a>
     <a href="#day">01 Day</a>
     <a href="#golden">02 Golden</a>
     <a href="#night">03 Night</a>
@@ -844,19 +1047,43 @@
 
 <!-- ===== STATS ===== -->
 <div class="stats">
-  <div class="stats__item"><span class="stats__num" id="stat-total">138</span><span>frames</span></div>
-  <div class="stats__item"><span class="stats__num" id="stat-day">65</span><span>shot in daylight</span></div>
-  <div class="stats__item"><span class="stats__num" id="stat-golden">36</span><span>at the golden hour</span></div>
-  <div class="stats__item"><span class="stats__num" id="stat-night">37</span><span>after dark</span></div>
+  <div class="stats__item"><span class="stats__num" id="stat-total">—</span><span>frames in total</span></div>
+  <div class="stats__item"><span class="stats__num" id="stat-day">—</span><span>shot in daylight</span></div>
+  <div class="stats__item"><span class="stats__num" id="stat-golden">—</span><span>at the golden hour</span></div>
+  <div class="stats__item"><span class="stats__num" id="stat-night">—</span><span>after dark</span></div>
 </div>
+
+<!-- ===== SLIDER FEATURE ===== -->
+<section class="slider-section" id="timelapse">
+  <header class="slider-section__head">
+    <div>
+      <div class="slider-section__num">00 / Time-lapse</div>
+      <h2 class="slider-section__title">One stretch of road, every hour</h2>
+    </div>
+    <div class="slider-section__sub">The same gantry, photographed from dark to morning to dusk to dark again.</div>
+  </header>
+
+  <div class="slider" id="slider" tabindex="0" aria-label="Time-of-day slideshow">
+    <div class="slider__progress"><div class="slider__progress-fill" id="slider-progress"></div></div>
+    <div class="slider__track" id="slider-track"></div>
+    <div class="slider__overlay">
+      <div class="slider__phase" id="slider-phase">—</div>
+      <div class="slider__caption" id="slider-caption">—</div>
+    </div>
+    <button class="slider__nav prev" id="slider-prev" aria-label="Previous frame">‹</button>
+    <button class="slider__nav next" id="slider-next" aria-label="Next frame">›</button>
+    <button class="slider__play" id="slider-play" aria-label="Pause"></button>
+    <div class="slider__dots" id="slider-dots"></div>
+  </div>
+</section>
 
 <!-- ===== CONTROLS ===== -->
 <div class="controls" id="controls">
   <div class="filters" role="group" aria-label="Filter images by time of day">
-    <button class="filter" data-filter="all" aria-pressed="true">All <span class="filter__count">(138)</span></button>
-    <button class="filter" data-filter="day" aria-pressed="false">Day <span class="filter__count">(65)</span></button>
-    <button class="filter" data-filter="golden" aria-pressed="false">Golden <span class="filter__count">(36)</span></button>
-    <button class="filter" data-filter="night" aria-pressed="false">Night <span class="filter__count">(37)</span></button>
+    <button class="filter" data-filter="all" aria-pressed="true">All <span class="filter__count" id="count-all"></span></button>
+    <button class="filter" data-filter="day" aria-pressed="false">Day <span class="filter__count" id="count-day"></span></button>
+    <button class="filter" data-filter="golden" aria-pressed="false">Golden <span class="filter__count" id="count-golden"></span></button>
+    <button class="filter" data-filter="night" aria-pressed="false">Night <span class="filter__count" id="count-night"></span></button>
   </div>
   <label class="toggle-cap">
     <input type="checkbox" id="toggle-all-caps" />
@@ -877,7 +1104,7 @@
   <div class="grid" id="grid-day"></div>
 </section>
 
-<!-- divider with a wide cinematic shot -->
+<!-- divider -->
 <div class="divider">
   <img class="divider__img" src="images/PGTA51743009422.jpg" alt="" loading="lazy" />
   <p class="divider__quote">Engine on, worries off, sunset on.</p>
@@ -944,28 +1171,31 @@
 <!-- ===== DATA + SCRIPT ===== -->
 <script>
 // ============================================
-// IMAGE MANIFEST  (138 frames, categorized + captioned)
+// DATA  (grid + slider manifests baked in at build time)
 // ============================================
-const IMAGES = [{"src": "PGTA51004880787.jpg", "time": "day", "caption": "Cruising into downtown."}, {"src": "PGTA5100630425.jpg", "time": "day", "caption": "Curve and committed."}, {"src": "PGTA51042480084.jpg", "time": "night", "caption": "Bob's Liquor — open late."}, {"src": "PGTA51063574792.jpg", "time": "day", "caption": "Fresh out of the shop."}, {"src": "PGTA51078224104.jpg", "time": "day", "caption": "Bird's-eye over Vespucci."}, {"src": "PGTA51101726877.jpg", "time": "golden", "caption": "Sun-flare grille."}, {"src": "PGTA51125688444.jpg", "time": "day", "caption": "Wheels above the city."}, {"src": "PGTA51142331289.jpg", "time": "night", "caption": "Cool Beans — closed for the night."}, {"src": "PGTA51161916766.jpg", "time": "day", "caption": "Roses on the right, road on the left."}, {"src": "PGTA51182464003.jpg", "time": "night", "caption": "Riding shotgun."}, {"src": "PGTA51194931594.jpg", "time": "golden", "caption": "Right under the V."}, {"src": "PGTA51194975742.jpg", "time": "night", "caption": "I-2, both directions."}, {"src": "PGTA51198503019.jpg", "time": "golden", "caption": "Pink sky on Strawberry Avenue."}, {"src": "PGTA51204315797.jpg", "time": "night", "caption": "Diamond night."}, {"src": "PGTA51236989040.jpg", "time": "golden", "caption": "WOOD."}, {"src": "PGTA51254972545.jpg", "time": "night", "caption": "Brake lights, downtown bound."}, {"src": "PGTA51255287787.jpg", "time": "night", "caption": "Eyes on the road."}, {"src": "PGTA51267720957.jpg", "time": "day", "caption": "Side profile, flowerbed flank."}, {"src": "PGTA51278173175.jpg", "time": "day", "caption": "I-2, business as usual."}, {"src": "PGTA51284115611.jpg", "time": "day", "caption": "Pulled up where the tourists can't."}, {"src": "PGTA51291819737.jpg", "time": "night", "caption": "Marquee profile."}, {"src": "PGTA51316967022.jpg", "time": "day", "caption": "Garage glow."}, {"src": "PGTA51317266445.jpg", "time": "day", "caption": "Hedges hide the horsepower."}, {"src": "PGTA51317815793.jpg", "time": "night", "caption": "Rain check on the rose garden."}, {"src": "PGTA51321759222.jpg", "time": "night", "caption": "Blue and red, again."}, {"src": "PGTA51335462169.jpg", "time": "golden", "caption": "End of the day, end of the road."}, {"src": "PGTA51341239599.jpg", "time": "day", "caption": "Pole position, terminal one."}, {"src": "PGTA51350592379.jpg", "time": "day", "caption": "Engine off. View on."}, {"src": "PGTA51377104441.jpg", "time": "day", "caption": "Smog stretched thin over Los Santos."}, {"src": "PGTA51380181126.jpg", "time": "golden", "caption": "Palm tree silhouettes."}, {"src": "PGTA51386423439.jpg", "time": "night", "caption": "Vanilla Unicorn parking."}, {"src": "PGTA5139895484.jpg", "time": "day", "caption": "Tools, tires, and a green machine."}, {"src": "PGTA5142831327.jpg", "time": "day", "caption": "Pulled up past the palms."}, {"src": "PGTA51443178568.jpg", "time": "golden", "caption": "Side profile, sundown."}, {"src": "PGTA51469182808.jpg", "time": "day", "caption": "The Richman Hotel."}, {"src": "PGTA51501768733.jpg", "time": "night", "caption": "Mural, spotlights, silence."}, {"src": "PGTA51509355475.jpg", "time": "golden", "caption": "Twilight commute."}, {"src": "PGTA5151265543.jpg", "time": "day", "caption": "Open road, shut sky."}, {"src": "PGTA5152275072.jpg", "time": "golden", "caption": "Skyline as a backdrop."}, {"src": "PGTA51546532271.jpg", "time": "day", "caption": "Skyline ahead."}, {"src": "PGTA51576374301.jpg", "time": "golden", "caption": "Owner's profile, Strawberry Avenue."}, {"src": "PGTA5158005416.jpg", "time": "day", "caption": "Sand, sun, and a sedan that doesn't belong."}, {"src": "PGTA51590957367.jpg", "time": "golden", "caption": "Last light through the palms."}, {"src": "PGTA51595412568.jpg", "time": "golden", "caption": "Mountains, dust, dusk."}, {"src": "PGTA51616185953.jpg", "time": "day", "caption": "Skyline patrol, helicopter cameo."}, {"src": "PGTA51621706418.jpg", "time": "night", "caption": "Window light and chrome."}, {"src": "PGTA51629590262.jpg", "time": "night", "caption": "Home for the evening."}, {"src": "PGTA51661128992.jpg", "time": "day", "caption": "Garage guard."}, {"src": "PGTA5166823353.jpg", "time": "golden", "caption": "Hollywood's answer, in petrol green."}, {"src": "PGTA51681370802.jpg", "time": "day", "caption": "Behind enemy lines, LSPD."}, {"src": "PGTA51692238825.jpg", "time": "day", "caption": "Front door delivery, police edition."}, {"src": "PGTA51706064261.jpg", "time": "golden", "caption": "Sun in the rear-view."}, {"src": "PGTA5171195858.jpg", "time": "day", "caption": "Letters, weeds, and a coupe."}, {"src": "PGTA51725901139.jpg", "time": "night", "caption": "Underpass, headlights, eyes ahead."}, {"src": "PGTA51741770691.jpg", "time": "night", "caption": "Outside the Hookah Palace."}, {"src": "PGTA51743009422.jpg", "time": "golden", "caption": "Pacific haze, Los Santos burning gold."}, {"src": "PGTA5176953779.jpg", "time": "night", "caption": "Underglow on a quiet pond."}, {"src": "PGTA51770811082.jpg", "time": "golden", "caption": "Empty street, full intent."}, {"src": "PGTA51784441857.jpg", "time": "golden", "caption": "Eastbound, no rush."}, {"src": "PGTA51787839369.jpg", "time": "day", "caption": "Hibiscus and horsepower."}, {"src": "PGTA51801198780.jpg", "time": "day", "caption": "Wheels and wings."}, {"src": "PGTA5181181015.jpg", "time": "day", "caption": "Quiet street, loud car."}, {"src": "PGTA518186761.jpg", "time": "day", "caption": "Los Santos Customs, regular customer."}, {"src": "PGTA51819625901.jpg", "time": "golden", "caption": "Backlit on the apron."}, {"src": "PGTA51821280372.jpg", "time": "day", "caption": "Where the road runs out."}, {"src": "PGTA51840658067.jpg", "time": "night", "caption": "Vinewood backdrop, no caption needed."}, {"src": "PGTA51909891180.jpg", "time": "day", "caption": "Sunglasses required."}, {"src": "PGTA51922824608.jpg", "time": "day", "caption": "Doors open, intentions clear."}, {"src": "PGTA51923472575.jpg", "time": "day", "caption": "Concrete river, concrete jungle."}, {"src": "PGTA51949999499.jpg", "time": "night", "caption": "Moon, palms, parked."}, {"src": "PGTA51966454458.jpg", "time": "golden", "caption": "Layover photo op."}, {"src": "PGTA5198691323.jpg", "time": "golden", "caption": "Front-row seat to the skyline."}, {"src": "PGTA51989844725.jpg", "time": "golden", "caption": "Above it all — the city softens at dusk."}, {"src": "PGTA51991856282.jpg", "time": "day", "caption": "Built in here."}, {"src": "PGTA51996780382.jpg", "time": "golden", "caption": "Silhouettes on the ridge."}, {"src": "PGTA52041433319.jpg", "time": "day", "caption": "Three lanes, one mood."}, {"src": "PGTA52041817482.jpg", "time": "day", "caption": "Off the path, on the cliff."}, {"src": "PGTA52058510639.jpg", "time": "day", "caption": "Painted hills, polished paint."}, {"src": "PGTA5206360401.jpg", "time": "golden", "caption": "Stop-sign reflections."}, {"src": "PGTA52077056120.jpg", "time": "night", "caption": "VIP, valet, vibe."}, {"src": "PGTA52087089925.jpg", "time": "golden", "caption": "Tarmac silhouette."}, {"src": "PGTA52107125311.jpg", "time": "golden", "caption": "Low and centered."}, {"src": "PGTA52111559468.jpg", "time": "golden", "caption": "Under the boardwalk, lights on."}, {"src": "PGTA52119745080.jpg", "time": "night", "caption": "Past midnight on the freeway."}, {"src": "PGTA52120861441.jpg", "time": "golden", "caption": "Through the archway, into the light."}, {"src": "PGTA52121822270.jpg", "time": "golden", "caption": "Tide's in, headlights off."}, {"src": "PGTA5242412198.jpg", "time": "day", "caption": "Yellow lines, green metal."}, {"src": "PGTA5246054836.jpg", "time": "day", "caption": "Color-matched to the wall."}, {"src": "PGTA5264442279.jpg", "time": "night", "caption": "Neon and a billboard sky."}, {"src": "PGTA5265439430.jpg", "time": "day", "caption": "Red's Auto Parts."}, {"src": "PGTA5283805961.jpg", "time": "golden", "caption": "Boardwalk hour."}, {"src": "PGTA5293210178.jpg", "time": "golden", "caption": "Mountains, smog, and the last light."}, {"src": "PGTA53038709.jpg", "time": "day", "caption": "Obey & survive — or just look the part."}, {"src": "PGTA530439879.jpg", "time": "night", "caption": "City lights, crescent moon."}, {"src": "PGTA5316159613.jpg", "time": "night", "caption": "Lit-up runway, low lights."}, {"src": "PGTA5318913337.jpg", "time": "night", "caption": "Open seven days, naturally."}, {"src": "PGTA5319238727.jpg", "time": "day", "caption": "Cones to the left, downtown straight."}, {"src": "PGTA5322978415.jpg", "time": "night", "caption": "Dusk at the Unicorn."}, {"src": "PGTA5352414730.jpg", "time": "day", "caption": "Steady on the dotted line."}, {"src": "PGTA5377791474.jpg", "time": "night", "caption": "Boutique window-shopping."}, {"src": "PGTA5391834051.jpg", "time": "day", "caption": "Canal-side companion."}, {"src": "PGTA5406722678.jpg", "time": "day", "caption": "Dog approves."}, {"src": "PGTA5406838660.jpg", "time": "day", "caption": "Alleyway portrait."}, {"src": "PGTA5420446060.jpg", "time": "night", "caption": "Boxed in on Eclipse Boulevard."}, {"src": "PGTA5462095407.jpg", "time": "night", "caption": "Pink lights, dark windows."}, {"src": "PGTA549622971.jpg", "time": "night", "caption": "Caught between two cruisers."}, {"src": "PGTA55169488.jpg", "time": "day", "caption": "Xero gas, regular fill-up."}, {"src": "PGTA5540326528.jpg", "time": "day", "caption": "Salvage yard parked."}, {"src": "PGTA5556058893.jpg", "time": "golden", "caption": "Backlit at the runway."}, {"src": "PGTA555938792.jpg", "time": "day", "caption": "Petrol green vs. peeling paint."}, {"src": "PGTA5587390440.jpg", "time": "golden", "caption": "Two ways to leave town."}, {"src": "PGTA563505704.jpg", "time": "day", "caption": "Ferris wheel and four wheels."}, {"src": "PGTA5654413423.jpg", "time": "night", "caption": "Quiet block on Rockford."}, {"src": "PGTA5661526373.jpg", "time": "golden", "caption": "When the sun won't quit."}, {"src": "PGTA5663618982.jpg", "time": "night", "caption": "Surrounded — and unbothered."}, {"src": "PGTA5702927317.jpg", "time": "day", "caption": "Painted wall, polished panels."}, {"src": "PGTA5720747407.jpg", "time": "night", "caption": "Headlights vs. headlights."}, {"src": "PGTA57241126.jpg", "time": "night", "caption": "Parked on the precinct seal."}, {"src": "PGTA5729202582.jpg", "time": "day", "caption": "Nose to nose with a private jet."}, {"src": "PGTA5732040732.jpg", "time": "day", "caption": "Polaroid #0069."}, {"src": "PGTA5741172001.jpg", "time": "day", "caption": "Quiet morning over the basin."}, {"src": "PGTA5768590519.jpg", "time": "day", "caption": "Owning the spillway."}, {"src": "PGTA5770628367.jpg", "time": "night", "caption": "Drizzle, sodium lamps, downtown."}, {"src": "PGTA5787417762.jpg", "time": "night", "caption": "Routine traffic stop."}, {"src": "PGTA5794814828.jpg", "time": "day", "caption": "Rain on the boulevard."}, {"src": "PGTA5796794117.jpg", "time": "day", "caption": "On the way to nowhere in particular."}, {"src": "PGTA5796981302.jpg", "time": "day", "caption": "Cleared for departure."}, {"src": "PGTA5797475344.jpg", "time": "day", "caption": "Coconut Cafe, since 1967."}, {"src": "PGTA5805489113.jpg", "time": "night", "caption": "House special."}, {"src": "PGTA5827208798.jpg", "time": "day", "caption": "Pier in the back, sunbathers in the front."}, {"src": "PGTA5827853703.jpg", "time": "day", "caption": "Don't panic — just polishing."}, {"src": "PGTA5849745256.jpg", "time": "day", "caption": "Tank, train, and a tuned-up sedan."}, {"src": "PGTA5878922620.jpg", "time": "day", "caption": "Bagels, coffee, milkshakes."}, {"src": "PGTA5890503645.jpg", "time": "golden", "caption": "Strawberry Avenue, slow burn."}, {"src": "PGTA591591975.jpg", "time": "golden", "caption": "Pre-flight check, kind of."}, {"src": "PGTA5938986195.jpg", "time": "golden", "caption": "Sun caught in the windshield."}, {"src": "PGTA5971308657.jpg", "time": "day", "caption": "Pale sky, full throttle."}, {"src": "PGTA5983683758.jpg", "time": "day", "caption": "Bridge, basin, business district."}];
+const IMAGES  = [{"src": "PGTA51042480084.jpg", "time": "night", "caption": "Bob's Liquor — open late.", "portrait": false}, {"src": "PGTA51063574792.jpg", "time": "day", "caption": "Fresh out of the shop.", "portrait": false}, {"src": "PGTA51078224104.jpg", "time": "day", "caption": "Bird's-eye over Vespucci.", "portrait": false}, {"src": "PGTA51101726877.jpg", "time": "golden", "caption": "Sun-flare grille.", "portrait": false}, {"src": "PGTA51125688444.jpg", "time": "day", "caption": "Wheels above the city.", "portrait": false}, {"src": "PGTA51142331289.jpg", "time": "night", "caption": "Cool Beans — closed for the night.", "portrait": false}, {"src": "PGTA51182464003.jpg", "time": "night", "caption": "Riding shotgun.", "portrait": false}, {"src": "PGTA51194975742.jpg", "time": "night", "caption": "I-2, both directions.", "portrait": false}, {"src": "PGTA51198503019.jpg", "time": "golden", "caption": "Pink sky on Strawberry Avenue.", "portrait": false}, {"src": "PGTA51204315797.jpg", "time": "night", "caption": "Diamond night.", "portrait": false}, {"src": "PGTA51236989040.jpg", "time": "golden", "caption": "WOOD.", "portrait": false}, {"src": "PGTA51267720957.jpg", "time": "day", "caption": "Side profile, flowerbed flank.", "portrait": false}, {"src": "PGTA51284115611.jpg", "time": "day", "caption": "Pulled up where the tourists can't.", "portrait": false}, {"src": "PGTA51317266445.jpg", "time": "day", "caption": "Hedges hide the horsepower.", "portrait": false}, {"src": "PGTA51317815793.jpg", "time": "night", "caption": "Rain check on the rose garden.", "portrait": false}, {"src": "PGTA51321759222.jpg", "time": "night", "caption": "Blue and red, again.", "portrait": false}, {"src": "PGTA51335462169.jpg", "time": "golden", "caption": "End of the day, end of the road.", "portrait": false}, {"src": "PGTA51341239599.jpg", "time": "day", "caption": "Pole position, terminal one.", "portrait": false}, {"src": "PGTA51350592379.jpg", "time": "day", "caption": "Engine off. View on.", "portrait": false}, {"src": "PGTA51377104441.jpg", "time": "day", "caption": "Smog stretched thin over Los Santos.", "portrait": false}, {"src": "PGTA51380181126.jpg", "time": "golden", "caption": "Palm tree silhouettes.", "portrait": false}, {"src": "PGTA51386423439.jpg", "time": "night", "caption": "Vanilla Unicorn parking.", "portrait": false}, {"src": "PGTA5139895484.jpg", "time": "day", "caption": "Tools, tires, and a green machine.", "portrait": false}, {"src": "PGTA51443178568.jpg", "time": "golden", "caption": "Side profile, sundown.", "portrait": false}, {"src": "PGTA51469182808.jpg", "time": "day", "caption": "The Richman Hotel.", "portrait": false}, {"src": "PGTA51501768733.jpg", "time": "night", "caption": "Mural, spotlights, silence.", "portrait": false}, {"src": "PGTA5152275072.jpg", "time": "golden", "caption": "Skyline as a backdrop.", "portrait": false}, {"src": "PGTA51576374301.jpg", "time": "golden", "caption": "Owner's profile, Strawberry Avenue.", "portrait": false}, {"src": "PGTA5158005416.jpg", "time": "day", "caption": "Sand, sun, and a sedan that doesn't belong.", "portrait": false}, {"src": "PGTA51590957367.jpg", "time": "golden", "caption": "Last light through the palms.", "portrait": false}, {"src": "PGTA51595412568.jpg", "time": "golden", "caption": "Mountains, dust, dusk.", "portrait": false}, {"src": "PGTA51616185953.jpg", "time": "day", "caption": "Skyline patrol, helicopter cameo.", "portrait": false}, {"src": "PGTA51621706418.jpg", "time": "night", "caption": "Window light and chrome.", "portrait": false}, {"src": "PGTA51629590262.jpg", "time": "night", "caption": "Home for the evening.", "portrait": false}, {"src": "PGTA51661128992.jpg", "time": "day", "caption": "Garage guard.", "portrait": false}, {"src": "PGTA5166823353.jpg", "time": "golden", "caption": "Hollywood's answer, in petrol green.", "portrait": false}, {"src": "PGTA51681370802.jpg", "time": "day", "caption": "Behind enemy lines, LSPD.", "portrait": false}, {"src": "PGTA51706064261.jpg", "time": "golden", "caption": "Sun in the rear-view.", "portrait": false}, {"src": "PGTA5171195858.jpg", "time": "day", "caption": "Letters, weeds, and a coupe.", "portrait": false}, {"src": "PGTA51725901139.jpg", "time": "night", "caption": "Underpass, headlights, eyes ahead.", "portrait": false}, {"src": "PGTA51741770691.jpg", "time": "night", "caption": "Outside the Hookah Palace.", "portrait": false}, {"src": "PGTA51743009422.jpg", "time": "golden", "caption": "Pacific haze, Los Santos burning gold.", "portrait": false}, {"src": "PGTA5176953779.jpg", "time": "night", "caption": "Underglow on a quiet pond.", "portrait": false}, {"src": "PGTA51770811082.jpg", "time": "golden", "caption": "Empty street, full intent.", "portrait": false}, {"src": "PGTA51787839369.jpg", "time": "day", "caption": "Hibiscus and horsepower.", "portrait": false}, {"src": "PGTA51801198780.jpg", "time": "day", "caption": "Wheels and wings.", "portrait": false}, {"src": "PGTA5181181015.jpg", "time": "day", "caption": "Quiet street, loud car.", "portrait": false}, {"src": "PGTA518186761.jpg", "time": "day", "caption": "Los Santos Customs, regular customer.", "portrait": false}, {"src": "PGTA51819625901.jpg", "time": "golden", "caption": "Backlit on the apron.", "portrait": false}, {"src": "PGTA51821280372.jpg", "time": "day", "caption": "Where the road runs out.", "portrait": false}, {"src": "PGTA51840658067.jpg", "time": "night", "caption": "Vinewood backdrop, no caption needed.", "portrait": false}, {"src": "PGTA51909891180.jpg", "time": "day", "caption": "Sunglasses required.", "portrait": false}, {"src": "PGTA51922824608.jpg", "time": "day", "caption": "Doors open, intentions clear.", "portrait": false}, {"src": "PGTA51923472575.jpg", "time": "day", "caption": "Concrete river, concrete jungle.", "portrait": false}, {"src": "PGTA51949999499.jpg", "time": "night", "caption": "Moon, palms, parked.", "portrait": false}, {"src": "PGTA51966454458.jpg", "time": "golden", "caption": "Layover photo op.", "portrait": false}, {"src": "PGTA5198691323.jpg", "time": "golden", "caption": "Front-row seat to the skyline.", "portrait": false}, {"src": "PGTA51989844725.jpg", "time": "golden", "caption": "Above it all — the city softens at dusk.", "portrait": false}, {"src": "PGTA51991856282.jpg", "time": "day", "caption": "Built in here.", "portrait": false}, {"src": "PGTA51996780382.jpg", "time": "golden", "caption": "Silhouettes on the ridge.", "portrait": false}, {"src": "PGTA52041817482.jpg", "time": "day", "caption": "Off the path, on the cliff.", "portrait": false}, {"src": "PGTA52058510639.jpg", "time": "day", "caption": "Painted hills, polished paint.", "portrait": false}, {"src": "PGTA5206360401.jpg", "time": "golden", "caption": "Stop-sign reflections.", "portrait": false}, {"src": "PGTA52077056120.jpg", "time": "night", "caption": "VIP, valet, vibe.", "portrait": false}, {"src": "PGTA52087089925.jpg", "time": "golden", "caption": "Tarmac silhouette.", "portrait": false}, {"src": "PGTA52107125311.jpg", "time": "golden", "caption": "Low and centered.", "portrait": false}, {"src": "PGTA52111559468.jpg", "time": "golden", "caption": "Under the boardwalk, lights on.", "portrait": false}, {"src": "PGTA52119745080.jpg", "time": "night", "caption": "Past midnight on the freeway.", "portrait": false}, {"src": "PGTA52120861441.jpg", "time": "golden", "caption": "Through the archway, into the light.", "portrait": false}, {"src": "PGTA52121822270.jpg", "time": "golden", "caption": "Tide's in, headlights off.", "portrait": false}, {"src": "PGTA5242412198.jpg", "time": "day", "caption": "Yellow lines, green metal.", "portrait": false}, {"src": "PGTA5246054836.jpg", "time": "day", "caption": "Color-matched to the wall.", "portrait": false}, {"src": "PGTA5264442279.jpg", "time": "night", "caption": "Neon and a billboard sky.", "portrait": false}, {"src": "PGTA5265439430.jpg", "time": "day", "caption": "Red's Auto Parts.", "portrait": false}, {"src": "PGTA5283805961.jpg", "time": "golden", "caption": "Boardwalk hour.", "portrait": false}, {"src": "PGTA530439879.jpg", "time": "night", "caption": "City lights, crescent moon.", "portrait": false}, {"src": "PGTA5316159613.jpg", "time": "night", "caption": "Lit-up runway, low lights.", "portrait": false}, {"src": "PGTA5322978415.jpg", "time": "night", "caption": "Dusk at the Unicorn.", "portrait": true}, {"src": "PGTA5352414730.jpg", "time": "day", "caption": "Steady on the dotted line.", "portrait": false}, {"src": "PGTA5377791474.jpg", "time": "night", "caption": "Boutique window-shopping.", "portrait": false}, {"src": "PGTA5406722678.jpg", "time": "day", "caption": "Dog approves.", "portrait": false}, {"src": "PGTA55169488.jpg", "time": "day", "caption": "Xero gas, regular fill-up.", "portrait": false}, {"src": "PGTA5540326528.jpg", "time": "day", "caption": "Salvage yard parked.", "portrait": false}, {"src": "PGTA5556058893.jpg", "time": "golden", "caption": "Backlit at the runway.", "portrait": false}, {"src": "PGTA555938792.jpg", "time": "day", "caption": "Petrol green vs. peeling paint.", "portrait": false}, {"src": "PGTA5587390440.jpg", "time": "golden", "caption": "Two ways to leave town.", "portrait": false}, {"src": "PGTA563505704.jpg", "time": "day", "caption": "Ferris wheel and four wheels.", "portrait": false}, {"src": "PGTA5654413423.jpg", "time": "night", "caption": "Quiet block on Rockford.", "portrait": false}, {"src": "PGTA5661526373.jpg", "time": "golden", "caption": "When the sun won't quit.", "portrait": false}, {"src": "PGTA5663618982.jpg", "time": "night", "caption": "Surrounded — and unbothered.", "portrait": false}, {"src": "PGTA5702927317.jpg", "time": "day", "caption": "Painted wall, polished panels.", "portrait": false}, {"src": "PGTA57241126.jpg", "time": "night", "caption": "Parked on the precinct seal.", "portrait": false}, {"src": "PGTA5729202582.jpg", "time": "day", "caption": "Nose to nose with a private jet.", "portrait": false}, {"src": "PGTA5732040732.jpg", "time": "day", "caption": "Polaroid #0069.", "portrait": false}, {"src": "PGTA5741172001.jpg", "time": "day", "caption": "Quiet morning over the basin.", "portrait": false}, {"src": "PGTA5768590519.jpg", "time": "day", "caption": "Owning the spillway.", "portrait": false}, {"src": "PGTA5787417762.jpg", "time": "night", "caption": "Routine traffic stop.", "portrait": false}, {"src": "PGTA5794814828.jpg", "time": "day", "caption": "Rain on the boulevard.", "portrait": false}, {"src": "PGTA5796794117.jpg", "time": "day", "caption": "On the way to nowhere in particular.", "portrait": false}, {"src": "PGTA5796981302.jpg", "time": "day", "caption": "Cleared for departure.", "portrait": false}, {"src": "PGTA5797475344.jpg", "time": "day", "caption": "Coconut Cafe, since 1967.", "portrait": false}, {"src": "PGTA5805489113.jpg", "time": "night", "caption": "House special.", "portrait": false}, {"src": "PGTA5827853703.jpg", "time": "day", "caption": "Don't panic — just polishing.", "portrait": false}, {"src": "PGTA5849745256.jpg", "time": "day", "caption": "Tank, train, and a tuned-up sedan.", "portrait": false}, {"src": "PGTA5878922620.jpg", "time": "day", "caption": "Bagels, coffee, milkshakes.", "portrait": false}, {"src": "PGTA5890503645.jpg", "time": "golden", "caption": "Strawberry Avenue, slow burn.", "portrait": false}, {"src": "PGTA591591975.jpg", "time": "golden", "caption": "Pre-flight check, kind of.", "portrait": false}, {"src": "PGTA5938986195.jpg", "time": "golden", "caption": "Sun caught in the windshield.", "portrait": false}];
+const SLIDER_FRAMES = [{"src": "PGTA51254972545.jpg", "phase": "Dark Night", "caption": "00:14 — sign lit, road quiet."}, {"src": "PGTA5151265543.jpg", "phase": "Dawn", "caption": "06:42 — first warmth on the gantry."}, {"src": "PGTA51278173175.jpg", "phase": "Clear Day", "caption": "11:30 — bright, cloudless, exposed."}, {"src": "PGTA5971308657.jpg", "phase": "Overcast", "caption": "15:18 — the sky decides to be moody."}, {"src": "PGTA5770628367.jpg", "phase": "Dusk", "caption": "19:04 — last commuters, first lamps."}, {"src": "PGTA51509355475.jpg", "phase": "Twilight", "caption": "20:31 — purple over downtown."}];
 
 // ============================================
-// LAYOUT VARIATION  — picks which cards become wide / tall
+// LAYOUT VARIATION
 // ============================================
-function classifyCard(index, totalInSection) {
-  // Pattern: every 7th card is wide, every 11th is tall
+function classifyCard(item, index) {
+  // Portrait override (the cropped Vanilla Unicorn)
+  if (item.portrait) return "portrait";
+  // Mix in some wide / tall variation for visual rhythm
   if (index % 11 === 5) return "tall";
   if (index % 7 === 3)  return "wide";
   return "";
 }
 
 // ============================================
-// RENDER GALLERIES
+// RENDER GRID
 // ============================================
 function renderGrid(time) {
   const grid = document.getElementById("grid-" + time);
   const items = IMAGES.filter(img => img.time === time);
   grid.innerHTML = items.map((img, i) => {
-    const variant = classifyCard(i, items.length);
+    const variant = classifyCard(img, i);
     const id = String(i + 1).padStart(3, "0");
     const tagId = time.toUpperCase().slice(0,3) + "-" + id;
     return `
@@ -989,6 +1219,131 @@ function renderGrid(time) {
 function escapeHtml(s) {
   return (s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 }
+
+// ============================================
+// SLIDER (auto-play with hover-pause + manual controls)
+// ============================================
+const SLIDE_DURATION_MS = 4000;
+const slider = {
+  el: null,
+  track: null,
+  frames: [],
+  dots: [],
+  current: 0,
+  playing: true,
+  hovered: false,
+  intervalId: null,
+  progressId: null,
+  progressStart: 0,
+
+  init() {
+    this.el = document.getElementById("slider");
+    this.track = document.getElementById("slider-track");
+    this.phaseEl = document.getElementById("slider-phase");
+    this.captionEl = document.getElementById("slider-caption");
+    this.progressEl = document.getElementById("slider-progress");
+    this.playBtn = document.getElementById("slider-play");
+
+    // Build frames
+    this.track.innerHTML = SLIDER_FRAMES.map((f, i) => `
+      <div class="slider__frame ${i === 0 ? 'active' : ''}" data-i="${i}">
+        <img src="images/${f.src}" alt="${escapeHtml(f.caption)}" loading="${i === 0 ? 'eager' : 'lazy'}" />
+      </div>
+    `).join("");
+
+    // Build dots
+    const dotsEl = document.getElementById("slider-dots");
+    dotsEl.innerHTML = SLIDER_FRAMES.map((_, i) => `
+      <button class="slider__dot ${i === 0 ? 'active' : ''}" data-i="${i}" aria-label="Go to frame ${i + 1}"></button>
+    `).join("");
+
+    this.frames = Array.from(this.track.querySelectorAll(".slider__frame"));
+    this.dots = Array.from(dotsEl.querySelectorAll(".slider__dot"));
+
+    this.updateMeta();
+    this.setPlayIcon();
+    this.attachEvents();
+    this.start();
+  },
+
+  attachEvents() {
+    document.getElementById("slider-prev").addEventListener("click", () => { this.go(this.current - 1); this.restartTimer(); });
+    document.getElementById("slider-next").addEventListener("click", () => { this.go(this.current + 1); this.restartTimer(); });
+
+    this.playBtn.addEventListener("click", () => { this.toggle(); });
+
+    this.dots.forEach((d, i) => {
+      d.addEventListener("click", () => { this.go(i); this.restartTimer(); });
+    });
+
+    this.el.addEventListener("mouseenter", () => { this.hovered = true; this.pauseTimer(); });
+    this.el.addEventListener("mouseleave", () => { this.hovered = false; if (this.playing) this.startTimer(); });
+
+    this.el.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft")  { this.go(this.current - 1); this.restartTimer(); }
+      else if (e.key === "ArrowRight") { this.go(this.current + 1); this.restartTimer(); }
+      else if (e.key === " ") { e.preventDefault(); this.toggle(); }
+    });
+  },
+
+  go(i) {
+    const total = this.frames.length;
+    this.current = ((i % total) + total) % total;
+    this.frames.forEach((f, idx) => f.classList.toggle("active", idx === this.current));
+    this.dots.forEach((d, idx) => d.classList.toggle("active", idx === this.current));
+    this.updateMeta();
+  },
+
+  updateMeta() {
+    const f = SLIDER_FRAMES[this.current];
+    // brief fade so phase/caption don't jump abruptly
+    this.phaseEl.style.opacity = "0";
+    this.captionEl.style.opacity = "0";
+    setTimeout(() => {
+      this.phaseEl.textContent = f.phase;
+      this.captionEl.textContent = f.caption;
+      this.phaseEl.style.opacity = "1";
+      this.captionEl.style.opacity = "1";
+    }, 200);
+  },
+
+  start() { if (!this.hovered) this.startTimer(); },
+  toggle() {
+    this.playing = !this.playing;
+    this.setPlayIcon();
+    if (this.playing && !this.hovered) this.startTimer();
+    else this.pauseTimer();
+  },
+  setPlayIcon() {
+    this.playBtn.innerHTML = this.playing
+      ? `<svg viewBox="0 0 14 14"><rect x="2" y="2" width="3" height="10"/><rect x="9" y="2" width="3" height="10"/></svg>`
+      : `<svg viewBox="0 0 14 14"><polygon points="3,2 12,7 3,12"/></svg>`;
+    this.playBtn.setAttribute("aria-label", this.playing ? "Pause" : "Play");
+  },
+  startTimer() {
+    this.pauseTimer();
+    this.progressStart = performance.now();
+    this.progressId = requestAnimationFrame(() => this.tickProgress());
+    this.intervalId = setTimeout(() => {
+      this.go(this.current + 1);
+      if (this.playing && !this.hovered) this.startTimer();
+    }, SLIDE_DURATION_MS);
+  },
+  pauseTimer() {
+    if (this.intervalId) { clearTimeout(this.intervalId); this.intervalId = null; }
+    if (this.progressId) { cancelAnimationFrame(this.progressId); this.progressId = null; }
+    this.progressEl.style.width = "0%";
+  },
+  restartTimer() {
+    if (this.playing && !this.hovered) this.startTimer();
+  },
+  tickProgress() {
+    const elapsed = performance.now() - this.progressStart;
+    const pct = Math.min(100, (elapsed / SLIDE_DURATION_MS) * 100);
+    this.progressEl.style.width = pct + "%";
+    if (pct < 100) this.progressId = requestAnimationFrame(() => this.tickProgress());
+  }
+};
 
 // ============================================
 // CAPTION TOGGLES
@@ -1050,9 +1405,9 @@ const lb = {
 function setupLightbox() {
   document.addEventListener("click", e => {
     if (e.target.closest(".card__cap-toggle")) return;
+    if (e.target.closest(".slider")) return; // slider clicks shouldn't open lightbox
     const card = e.target.closest(".card");
     if (!card) return;
-    // Build list of currently visible cards in active filter
     const activeFilter = document.querySelector(".filter[aria-pressed='true']").dataset.filter;
     const cards = Array.from(document.querySelectorAll(".card")).filter(c => {
       return activeFilter === "all" || c.dataset.time === activeFilter;
@@ -1093,7 +1448,6 @@ function setupFilters() {
         const show = (target === "all" || s.dataset.section === target);
         s.style.display = show ? "" : "none";
       });
-      // Hide dividers when filtering
       document.querySelectorAll(".divider").forEach(d => {
         d.style.display = (target === "all") ? "" : "none";
       });
@@ -1129,12 +1483,26 @@ document.addEventListener("DOMContentLoaded", () => {
   setupLightbox();
   setupFilters();
   setupNavScroll();
+  slider.init();
 
-  // Update stats from actual manifest
-  document.getElementById("stat-total").textContent = IMAGES.length;
-  document.getElementById("stat-day").textContent = IMAGES.filter(i => i.time === "day").length;
-  document.getElementById("stat-golden").textContent = IMAGES.filter(i => i.time === "golden").length;
-  document.getElementById("stat-night").textContent = IMAGES.filter(i => i.time === "night").length;
+  // Stats
+  const totalGrid = IMAGES.length;
+  const dayCount = IMAGES.filter(i => i.time === "day").length;
+  const goldenCount = IMAGES.filter(i => i.time === "golden").length;
+  const nightCount = IMAGES.filter(i => i.time === "night").length;
+  const totalCounted = totalGrid + SLIDER_FRAMES.length;
+
+  document.getElementById("stat-total").textContent = totalCounted;
+  document.getElementById("stat-day").textContent = dayCount;
+  document.getElementById("stat-golden").textContent = goldenCount;
+  document.getElementById("stat-night").textContent = nightCount;
+  document.getElementById("count-all").textContent = "(" + totalGrid + ")";
+  document.getElementById("count-day").textContent = "(" + dayCount + ")";
+  document.getElementById("count-golden").textContent = "(" + goldenCount + ")";
+  document.getElementById("count-night").textContent = "(" + nightCount + ")";
+
+
+  // Hero meta is intentionally static text now ("In a few frames") — no auto-rewrite.
 });
 </script>
 
